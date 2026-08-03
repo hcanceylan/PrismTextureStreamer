@@ -1,4 +1,4 @@
-name: Build C++ DLL
+name: Build PrismTextureStreamer DLL
 
 on:
   push:
@@ -17,15 +17,20 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Projeyi Release/x64 Olarak Derle
+      shell: cmd
       run: >
-        msbuild 
-        /p:Configuration=Release 
-        /p:Platform=x64 
-        /p:WindowsTargetPlatformVersion=10.0 
-        "/p:LinkAdditionalOptions=WindowsApp.lib runtimeobject.lib"
+        msbuild PrismTextureStreamerFB.sln
+        /p:Configuration=Release
+        /p:Platform=x64
+        /p:WindowsTargetPlatformVersion=10.0
+        /p:LanguageStandard=stdcpp20
+        /p:CppWinRTOptimize=true
+        /p:AdditionalDependencies="WindowsApp.lib;runtimeobject.lib;onecore.lib;%%(AdditionalDependencies)"
 
     - name: Üretilen DLL Dosyasını Yükle (Artifact)
       uses: actions/upload-artifact@v4
       with:
-        name: Compiled-DLL
-        path: '**/*.dll'
+        name: PrismTextureStreamerFB-DLL
+        path: |
+          **/Release/*.dll
+          **/x64/Release/*.dll
