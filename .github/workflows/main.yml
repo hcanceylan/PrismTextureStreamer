@@ -3,7 +3,7 @@ name: Build C++ DLL
 on:
   push:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Elle tetiklemek için
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,11 +16,11 @@ jobs:
     - name: MSBuild Yolunu Ayarla
       uses: microsoft/setup-msbuild@v2
 
-    - name: Projeyi Release/x64 Olarak Derle
-      run: msbuild /p:Configuration=Release /p:Platform=x64
+    - name: Projeyi Release/x64 Olarak Derle (SDK Otomatik Seçimli)
+      run: msbuild /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0
 
     - name: Üretilen DLL Dosyasını Yükle (Artifact)
       uses: actions/upload-artifact@v4
       with:
         name: Compiled-DLL
-        path: '**/*.dll' # Proje içindeki tüm .dll çıktılarını yakalar
+        path: '**/*.dll'
