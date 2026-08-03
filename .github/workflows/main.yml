@@ -13,19 +13,21 @@ jobs:
     - name: Repo Kodlarını Çek
       uses: actions/checkout@v4
 
+    - name: Proje Dosyasına (vcxproj) WinRT Kütüphanelerini Enjekte Et
+      shell: powershell
+      run: |
+        $projFile = "PrismTextureStreamerFB/PrismTextureStreamerFB.vcxproj"
+        $content = Get-Content $projFile
+        # Linker kütüphanelerine WindowsApp.lib ve runtimeobject.lib ekle
+        $injected = $content -replace '</Link>', '<AdditionalDependencies>WindowsApp.lib;runtimeobject.lib;onecore.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>'
+        $injected | Set-Content $projFile
+
     - name: MSBuild Yolunu Ayarla
       uses: microsoft/setup-msbuild@v2
 
     - name: Projeyi Release/x64 Olarak Derle
       shell: cmd
-      run: >
-        msbuild PrismTextureStreamerFB.sln
-        /p:Configuration=Release
-        /p:Platform=x64
-        /p:WindowsTargetPlatformVersion=10.0
-        /p:LanguageStandard=stdcpp20
-        /p:CppWinRTOptimize=true
-        /p:AdditionalDependencies="WindowsApp.lib;runtimeobject.lib;onecore.lib;%%(AdditionalDependencies)"
+      run: msbuild PrismTextureStreamerFB.sln /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0
 
     - name: Üretilen DLL Dosyasını Yükle (Artifact)
       uses: actions/upload-artifact@v4
